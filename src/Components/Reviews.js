@@ -11,7 +11,7 @@ function Reviews() {
   const { id } = useParams();
 
   useEffect(() => {
-    axios.get(`${API}/reviews?bookmarkId=${id}`)
+    axios.get(`${API}/bookmarks/${id}/reviews`)
       .then((response) => {
         console.log(response)
         setReviews(response.data)
@@ -49,7 +49,7 @@ function Reviews() {
   }
 
   const handleDelete = (id) => {
-    axios.delete(`${API}/reviews/${id}`)
+    axios.delete(`${API}/bookmarks/${id}/reviews/${id}`)
       .then((response) => {
         const copyReviewArray = [...reviews];
         const indexDeletedReview = copyReviewArray.findIndex((review) => {
@@ -64,16 +64,31 @@ function Reviews() {
       )
       .catch((c) => console.warn("catch", c))
   }
+const handleEdit = (updatedReview) => {
+  axios.put(`${API}/bookmarks${id}/reviews/${updatedReview.id}`, updatedReview)
+  .then((response) => {
+    const copyReviewArray = [...reviews];
+    const indexUpdatedReview = copyReviewArray.findIndex((review) => {
+      return review.id === updatedReview.id
+    });
+    //console.log(copyReviewArray[indexUpdatedReview])
+    copyReviewArray[indexUpdatedReview] = response.data
+    //console.log(response.data)
+    setReviews(copyReviewArray)
+  })
+  .catch((c) => console.warn("catch", c));
+}
 
   return (
     <section className="Reviews">
       <h2>Reviews</h2>
+
       <ReviewForm handleSubmit={handleAdd}>
         <h3>Add a New Review</h3>
       </ReviewForm >
       {
         reviews.map((review) => {
-          return <Review key={review.id} review={review} handleDelete={handleDelete} />
+          return <Review key={review.id} review={review} handleDelete={handleDelete} handleSubmit={handleEdit}/>
         })
       }
     </section>
